@@ -48,8 +48,7 @@ assignemnt_6/
 ├── Result_Screenshot.png
 ├── static/
 │   └── zone_mapping.csv
-├── stream_input/
-└── stream_input_backup/
+
 ```
 
 ## Static Zone Mapping
