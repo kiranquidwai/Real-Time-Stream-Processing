@@ -77,7 +77,7 @@ I have used the sliding window for this dataset because it is appropriate for co
 Compared with a tumbling window, the sliding window detects changes earlier because it does not wait for one full non-overlapping period to finish.
 
 ## Where the pipeline requires state.
-The pipeline required state during the window aggregation. Spark must keep records that belong to each active 5-minute window so it can calculate the average consumption per zone. Also, state is  required when comparing residential consumption with the industrial average for the same time window. Whereas watermarking is used on the event timestamp to limit how long Spark keeps old window state.
+State is required during window aggregation because Spark maintains intermediate averages for overlapping windows and multiple micro-batches. Also, it needed for comparing residential and industrial consumption averages, as the anomaly detection logic depends on aggregated values accumulated over time rather than individual incoming records.
 
 ## Alert Condition
 
