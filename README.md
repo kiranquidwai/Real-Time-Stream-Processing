@@ -1,6 +1,6 @@
 # Real-Time Stream Processing Assignment — for Smart Power Grid
 
-## Scenario
+## Objective
 
 This project has built a Spark structured Streaming pipeline for a smart power grid, whose goal is to detect residential zones whose electricity consumption unexpectedly exceeds the industrial average.
 
@@ -18,6 +18,17 @@ The original dataset file is:
 ```text
 household_power_consumption.txt
 ```
+The original dataset file is:
+
+household_power_consumption.txt
+
+Place it inside:
+
+data/
+
+Expected path:
+
+data/household_power_consumption.txt
 
 The dataset is semicolon-separated, with columns such as:
 
@@ -34,9 +45,7 @@ assignemnt_6/
 ├── pipeline.py
 ├── make_batches.py
 ├── README.md
-├── Screenshot.png
-├── data/
-│   └── household_power_consumption.txt
+├── Result_Screenshot.png
 ├── static/
 │   └── zone_mapping.csv
 ├── stream_input/
@@ -68,13 +77,7 @@ I have used the sliding window for this dataset because it is appropriate for co
 
 Compared with a tumbling window, the sliding window detects changes earlier because it does not wait for one full non-overlapping period to finish.
 
-## Where the Pipeline Requires State
-
-The pipeline requires state during the window aggregation. Spark must keep records that belong to each active 5-minute window so it can calculate the average consumption per zone.
-
-State is also required when comparing residential consumption with the industrial average for the same time window.
-
-Watermarking is used on the event timestamp to limit how long Spark keeps old window state.
+The pipeline required state during the window aggregation. Spark must keep records that belong to each active 5-minute window so it can calculate the average consumption per zone. Also, state is  required when comparing residential consumption with the industrial average for the same time window. Whereas watermarking is used on the event timestamp to limit how long Spark keeps old window state.
 
 ## Alert Condition
 
@@ -133,21 +136,7 @@ Run:
 python make_batches.py
 ```
 
-This reads the original dataset, creates synthetic meter IDs, combines `Date` and `Time` into a timestamp column, and generates batch CSV files.
-
-The generated stream files are placed in:
-
-```text
-stream_input/
-```
-
-or:
-
-```text
-stream_input_backup/
-```
-
-depending on the version being run.
+It will read the original dataset, and will create the synthetic meter IDs, and generate batch CSV files.
 
 ### Step 3: Run the Spark Streaming Pipeline
 
@@ -157,77 +146,13 @@ Run:
 python pipeline.py
 ```
 
-The Spark job watches the streaming input folder and processes the incoming CSV batches.
-
 ### Step 4: Observe Alert Output
 
-When a residential zone's average consumption exceeds the industrial average in the same sliding window, the console prints an alert table.
+If a residential zone's average consumption exceeds the industrial average in the same sliding window, it will be printed in an alert table.
 
-Example output:
-
-```text
-===== GRID ANOMALY ALERTS =====
-
-+-------------------+-------------------+-------+-----------+---------------+--------------+
-|window_start       |window_end         |zone_id|zone_type  |avg_consumption|industrial_avg|
-+-------------------+-------------------+-------+-----------+---------------+--------------+
-|2006-12-16 17:24:00|2006-12-16 17:29:00|RZ_01  |residential|4.216          |3.666         |
-+-------------------+-------------------+-------+-----------+---------------+--------------+
-```
-
-Take a screenshot of the console when the grid anomaly alert fires.
-
-## Running in Google Colab
-
-Upload the zipped project folder to Colab.
-
-Unzip it:
-
-```python
-!unzip -q assignemnt_6.zip
-```
-
-Move into the project directory:
-
-```python
-%cd /content/assignemnt_6/assignemnt_6
-```
-
-Install dependencies:
-
-```python
-!pip install pyspark==3.5.0 pandas
-```
-
-Generate batches:
-
-```python
-!python make_batches.py
-```
-
-Run the pipeline:
-
-```python
-!python pipeline.py
-```
-
-## Expected Result
-
-The program should print:
-
-```text
-Smart Power Grid Monitor running...
-Watching stream_input/ for new files
-```
-
-Then, after processing the streaming batches, it should print:
 
 ```text
 ===== GRID ANOMALY ALERTS =====
-```
 
+```
 This confirms that the alert condition has fired successfully.
-
-## Notes
-
-The UCI dataset represents one household, so synthetic smart-meter IDs are created to simulate multiple residential and industrial zones. This is necessary because the assignment requires a static meter-to-zone mapping, but the original dataset does not provide these fields.
